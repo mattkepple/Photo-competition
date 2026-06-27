@@ -145,12 +145,18 @@ async function jbWrite(binId, data) {
 }
 
 async function jbCreate(data) {
+  var body = JSON.stringify(data);
+  console.log("Creating bin, payload size:", body.length, "bytes");
   var r = await fetch(JBURL, {
     method:"POST",
     headers:Object.assign({},JBHDR,{"X-Bin-Private":"true"}),
-    body:JSON.stringify(data)
+    body:body
   });
-  if (!r.ok) throw new Error("create failed "+r.status);
+  if (!r.ok) {
+    var errBody = await r.text();
+    console.error("jbCreate failed:", r.status, errBody);
+    throw new Error("Image upload failed ("+r.status+") — try a smaller photo");
+  }
   var d = await r.json();
   return d.metadata.id;
 }
@@ -209,13 +215,13 @@ function compressImg(file) {
       var img=new Image();
       img.onerror=rej;
       img.onload=function(){
-        var MAX=700,cv=document.createElement("canvas");
+        var MAX=480,cv=document.createElement("canvas");
         var w=img.width,h=img.height;
         if(w>h&&w>MAX){h=(h*MAX/w)|0;w=MAX;}
         else if(h>MAX){w=(w*MAX/h)|0;h=MAX;}
         cv.width=w;cv.height=h;
         cv.getContext("2d").drawImage(img,0,0,w,h);
-        res(cv.toDataURL("image/jpeg",0.75));
+        res(cv.toDataURL("image/jpeg",0.55));
       };
       img.src=e.target.result;
     };
@@ -367,7 +373,7 @@ function renderSub(main,subs){
       var f=e.target.files[0];if(!f)return;
       btn.disabled=true;btn.textContent="Uploading... please wait";errP.style.display="none";
       try{await addPhoto(TAB,f,descIn.value);}
-      catch(ex){errP.textContent="Upload failed — check connection and try again";errP.style.display="block";}
+      catch(ex){errP.textContent=ex.message||"Upload failed — try again";errP.style.display="block";console.error(ex);}
       btn.disabled=false;btn.textContent="Add photo";fileIn.value="";
     };
     card.appendChild(body);
