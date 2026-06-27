@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cornwall Photo Comp</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:system-ui,sans-serif;background:#F8F4E9;color:#1B231F;padding-bottom:70px;min-height:100vh;}
+:root{--deep:#0F3A33;--sea:#1B4B43;--sand:#F8F4E9;--sandD:#EDE3CB;--coral:#E8623D;--foam:#BFE3DD;--slate:#4B5650;}
+#header{background:var(--deep);color:var(--sandD);padding:12px 16px;position:sticky;top:0;z-index:10;box-shadow:0 3px 14px rgba(0,0,0,.22);}
+#header h1{font-family:Georgia,serif;font-size:1.1rem;font-weight:700;margin-bottom:5px;}
+#header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+#header-row2{display:flex;align-items:center;justify-content:space-between;}
+#phase-label{font-size:.78rem;color:var(--foam);}
+#advance-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:var(--sandD);border-radius:999px;padding:4px 12px;font-size:.73rem;cursor:pointer;font-family:inherit;font-weight:600;}
+#header-btns{display:flex;gap:6px;}
+.hbtn{background:rgba(255,255,255,.12);border:none;color:var(--foam);border-radius:999px;padding:3px 10px;font-size:.73rem;cursor:pointer;font-family:inherit;}
+#tabs{background:var(--deep);display:flex;gap:2px;padding:0 8px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tab-btn{flex-shrink:0;padding:8px 11px;border:none;cursor:pointer;font-size:.78rem;font-weight:600;border-radius:7px 7px 0 0;font-family:inherit;white-space:nowrap;background:rgba(255,255,255,.1);color:var(--sandD);}
+.tab-btn.active{background:var(--sand);color:var(--deep);}
+#main{max-width:560px;margin:0 auto;padding:12px 14px;}
+.card{background:#fff;border-radius:12px;margin-bottom:12px;border:1px solid rgba(0,0,0,.07);overflow:hidden;}
+.card-head{padding:11px 14px;font-family:Georgia,serif;font-weight:600;color:var(--deep);border-bottom:1px solid rgba(0,0,0,.06);font-size:.95rem;}
+.card-body{padding:10px 14px;}
+.prog-row{display:flex;justify-content:space-around;}
+.prog-item{text-align:center;}
+.prog-num{font-weight:700;font-size:1.3rem;color:var(--slate);}
+.prog-num.has{color:var(--sea);}
+.prog-name{font-size:.72rem;color:var(--slate);}
+.prog-label{font-size:.7rem;color:var(--slate);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+input[type=text]{width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(0,0,0,.12);font-family:inherit;font-size:.88rem;margin-bottom:8px;}
+.btn{padding:10px 18px;border-radius:999px;border:none;cursor:pointer;font-size:.88rem;font-weight:600;font-family:inherit;width:100%;}
+.btn-sea{background:var(--sea);color:#fff;}
+.btn:disabled{opacity:.5;cursor:default;}
+.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.photo-card{border-radius:10px;overflow:hidden;border:2px solid rgba(0,0,0,.07);transition:border-color .15s;}
+.photo-card.voted{border:3px solid var(--coral);}
+.photo-card.own{border:2px solid rgba(0,0,0,.1);opacity:.7;}
+.photo-card.winner{border:2px solid var(--coral);}
+.photo-card.second{border:2px solid #aaa;}
+.photo-card.third{border:2px solid #cd7f32;}
+.photo-img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--foam);}
+.photo-ph{width:100%;aspect-ratio:4/3;background:var(--foam);display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--slate);}
+.photo-meta{padding:6px 8px;font-size:.75rem;color:var(--slate);}
+.photo-owner{font-weight:700;color:var(--deep);margin-bottom:1px;}
+#name-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:var(--deep);padding:20px;}
+#name-screen h1{font-family:Georgia,serif;color:var(--sandD);font-size:1.5rem;font-weight:700;margin-bottom:4px;text-align:center;}
+#name-screen p{color:var(--foam);font-size:.9rem;margin-bottom:28px;}
+.name-btn{display:block;width:200px;padding:14px;margin:6px 0;border-radius:999px;border:none;background:var(--sea);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;font-family:Georgia,serif;}
+#splash{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:var(--deep);color:var(--foam);gap:14px;}
+#splash p{font-family:Georgia,serif;font-size:1.1rem;}
+#err-bar{background:var(--coral);color:#fff;padding:8px 16px;font-size:.82rem;text-align:center;display:none;}
+.hint{font-size:.78rem;color:var(--slate);margin-bottom:8px;}
+.tag{display:inline-block;font-size:.75rem;border-radius:999px;padding:3px 10px;}
+.tag-voted{background:rgba(27,75,67,.1);color:var(--sea);}
+.tag-pending{background:rgba(0,0,0,.05);color:var(--slate);}
+.winner-banner{padding:8px 14px 12px;color:var(--coral);font-weight:700;}
+.divider{border-top:1px solid rgba(0,0,0,.06);}
+.cat-row{padding:9px 14px;display:flex;align-items:center;justify-content:space-between;font-size:.88rem;}
+.cat-winner{font-weight:600;color:var(--coral);font-size:.82rem);}
+.overall-banner{background:var(--deep);color:var(--sandD);border-radius:12px;margin-bottom:12px;overflow:hidden;}
+.overall-inner{padding:20px 16px 14px;text-align:center;}
+.overall-title{font-family:Georgia,serif;font-size:1.1rem;color:var(--foam);margin-bottom:4px;}
+.overall-name{color:var(--coral);font-weight:800;font-size:1.5rem;font-family:Georgia,serif;}
+.overall-pts{color:var(--foam);font-size:.82rem;margin-top:4px;}
+.podium{display:flex;justify-content:space-around;padding:0 16px 18px;}
+.podium-item{text-align:center;}
+.podium-medal{font-size:1.1rem;font-weight:700;color:var(--sandD);}
+.podium-name{font-weight:700;color:var(--sandD);font-size:.9rem;margin-top:2px;}
+.podium-pts{color:var(--foam);font-size:.75rem;}
+.pos-rel{position:relative;}
+.del-btn{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:.72rem;display:flex;align-items:center;justify-content:center;}
+.other-hint{padding:10px 14px;font-size:.85rem;color:var(--slate);}
+.success-msg{text-align:center;padding:14px 0;color:var(--sea);font-weight:600;font-size:.88rem;}
+.busy-overlay{padding:12px 14px;font-size:.85rem;color:var(--slate);font-style:italic;}
+</style>
+</head>
+<body>
+
+<div id="splash"><div style="font-size:2.5rem">📷</div><p>Loading...</p></div>
+
+<div id="token-screen" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:var(--deep);padding:24px;text-align:center">
+  <div style="font-size:3rem;margin-bottom:10px">🔑</div>
+  <h1 style="font-family:Georgia,serif;color:#EDE3CB;font-size:1.3rem;margin-bottom:6px">Cornwall Photo Comp</h1>
+  <p style="color:#BFE3DD;font-size:.85rem;margin-bottom:20px;max-width:280px">Paste your GitHub token to get started. It will be saved on this device.</p>
+  <input id="token-input" type="text" placeholder="github_pat_..." style="width:100%;max-width:320px;padding:10px 12px;border-radius:8px;border:none;font-size:.85rem;margin-bottom:10px;font-family:monospace">
+  <button onclick="submitToken()" style="width:100%;max-width:320px;padding:12px;border-radius:999px;border:none;background:#1B4B43;color:#fff;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit">Continue</button>
+</div>
+
+<div id="name-screen" style="display:none">
+  <div style="font-size:3.5rem;margin-bottom:8px">📷</div>
+  <h1>Cornwall Photo Comp</h1>
+  <p>Who are you?</p>
+  <div id="name-btns"></div>
+</div>
+
+<div id="app" style="display:none">
+  <div id="header">
+    <div id="header-top">
+      <h1>Cornwall Photo Comp</h1>
+      <div id="header-btns">
+        <button class="hbtn" id="refresh-btn">Refresh</button>
+        <button class="hbtn" id="switch-btn"></button>
+      </div>
+    </div>
+    <div id="header-row2">
+      <span id="phase-label"></span>
+      <button id="advance-btn" style="display:none"></button>
+    </div>
+  </div>
+  <div id="err-bar"></div>
+  <div id="tabs"></div>
+  <div id="main"></div>
+</div>
+
+<script>
+// ── Config ─────────────────────────────────────────────────────────────
+const NAMES = ["Matt","Jen","Jack","Helen"];
+const CATS  = [
+  {id:"reflections", label:"Reflections"},
+  {id:"lightdark",   label:"Light and Dark"},
+  {id:"abstract",    label:"Abstract"},
+  {id:"nature",      label:"Nature"},
+  {id:"surreal",     label:"Surreal / Funny"},
+  {id:"movement",    label:"Movement"},
+  {id:"open",        label:"Open"},
+];
+
+// Token is read from the URL hash on first visit, then saved to localStorage.
+// Share the app URL with #YOUR_TOKEN appended once — after that it's remembered.
+function getToken() {
+  var hash = window.location.hash.replace(/^#/,"").trim();
+  if (hash && hash.length > 20) { localStorage.setItem("cpc_token", hash); return hash; }
+  return localStorage.getItem("cpc_token") || null;
+}
+var TOKEN = getToken();
+const REPO    = "mattkepple/Photo-competition";
+const GH_BASE = "https://api.github.com/repos/" + REPO + "/contents";
+function GH_HDR() {
+  return {
+    "Authorization": "Bearer " + (TOKEN || getToken() || ""),
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28"
+  };
+}
+
+// ── State ──────────────────────────────────────────────────────────────
+let ME      = null;
+let TAB     = CATS[0].id;
+let DATA    = {phase:"submission", subs:[], votes:{}};
+let IMGS    = {};
+let WRITING = false;
+
+// ── GitHub helpers ─────────────────────────────────────────────────────
+function b64enc(str) {
+  try { return btoa(unescape(encodeURIComponent(str))); }
+  catch(e) { return btoa(str); }
+}
+function b64dec(b64) {
+  try { return decodeURIComponent(escape(atob(b64.replace(/\s/g,"")))); }
+  catch(e) { return atob(b64.replace(/\s/g,"")); }
+}
+
+async function ghGet(path) {
+  const r = await fetch(GH_BASE + "/" + path, {headers: GH_HDR()});
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error("Read failed " + r.status);
+  const d = await r.json();
+  return {sha: d.sha, text: b64dec(d.content)};
+}
+
+async function ghPut(path, text, sha) {
+  const body = {message:"update", content: b64enc(text)};
+  if (sha) body.sha = sha;
+  const r = await fetch(GH_BASE + "/" + path, {
+    method: "PUT",
+    headers: Object.assign({}, GH_HDR(), {"Content-Type":"application/json"}),
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) throw new Error("Write failed " + r.status);
+  const d = await r.json();
+  return d.content.sha;
+}
+
+// ── State read/write ───────────────────────────────────────────────────
+async function readMain() {
+  const f = await ghGet("state.json");
+  if (!f) return {data:{phase:"submission",subs:[],votes:{}}, sha:null};
+  return {data: JSON.parse(f.text), sha: f.sha};
+}
+
+async function writeMain(data, sha) {
+  return await ghPut("state.json", JSON.stringify(data), sha);
+}
+
+// ── Image read/write ───────────────────────────────────────────────────
+async function saveImgToGH(id, dataUrl) {
+  await ghPut("images/" + id, dataUrl, null);
+}
+
+async function loadImgFromGH(id) {
+  const f = await ghGet("images/" + id);
+  return f ? f.text : null;
+}
+
+// ── Retry helper ───────────────────────────────────────────────────────
+async function withRetry(fn, attempts) {
+  attempts = attempts || 3;
+  for (var i = 0; i < attempts; i++) {
+    try { return await fn(); }
+    catch(e) {
+      if (i === attempts - 1) throw e;
+      await new Promise(function(r){setTimeout(r, 1500*(i+1));});
+    }
+  }
+}
+
+// ── Sync ───────────────────────────────────────────────────────────────
+async function sync(showBtn) {
+  if (WRITING) return;
+  if (showBtn) document.getElementById("refresh-btn").textContent = "...";
+  try {
+    var result = await withRetry(readMain);
+    DATA = result.data;
+    render();
+    showErr(null);
+  } catch(e) {
+    showErr("Connection issue — tap Retry");
+  }
+  if (showBtn) document.getElementById("refresh-btn").textContent = "Refresh";
+}
+
+async function save(next) {
+  WRITING = true;
+  DATA = next;
+  render();
+  try {
+    var r = await withRetry(readMain);
+    await withRetry(function(){ return writeMain(next, r.sha); });
+    showErr(null);
+  } catch(e) {
+    showErr("Save failed — tap Retry");
+  }
+  WRITING = false;
+}
+
+function showErr(msg) {
+  var b = document.getElementById("err-bar");
+  if (msg) {
+    b.innerHTML = msg + ' &nbsp;<button onclick="sync(true)" style="background:rgba(255,255,255,.25);border:none;color:#fff;border-radius:999px;padding:2px 10px;cursor:pointer;font-size:.8rem;font-family:inherit;">Retry</button>';
+    b.style.display = "block";
+  } else { b.style.display = "none"; }
+}
+
+async function loadImg(id) {
+  if (!id) return null;
+  if (IMGS[id]) return IMGS[id];
+  try {
+    var d = await loadImgFromGH(id);
+    if (d) IMGS[id] = d;
+    return d;
+  } catch(e) { return null; }
+}
+
+// ── Image compression ──────────────────────────────────────────────────
+function compressImg(file) {
+  return new Promise(function(res, rej) {
+    var rd = new FileReader();
+    rd.onerror = rej;
+    rd.onload = function(e) {
+      var img = new Image();
+      img.onerror = rej;
+      img.onload = function() {
+        var MAX = 600, cv = document.createElement("canvas");
+        var w = img.width, h = img.height;
+        if (w > h && w > MAX) { h = (h*MAX/w)|0; w = MAX; }
+        else if (h > MAX) { w = (w*MAX/h)|0; h = MAX; }
+        cv.width = w; cv.height = h;
+        cv.getContext("2d").drawImage(img, 0, 0, w, h);
+        res(cv.toDataURL("image/jpeg", 0.72));
+      };
+      img.src = e.target.result;
+    };
+    rd.readAsDataURL(file);
+  });
+}
+
+function uid() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+
+function seededShuffle(arr, seed) {
+  var a = arr.slice(); var s = (seed||1) % 2147483647;
+  for (var i = a.length-1; i > 0; i--) {
+    s = (s*16807) % 2147483647;
+    var j = s % (i+1);
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function el(tag, cls) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  return e;
+}
+
+// ── Boot ───────────────────────────────────────────────────────────────
+function submitToken() {
+  var t = document.getElementById("token-input").value.trim();
+  if (!t) return;
+  localStorage.setItem("cpc_token", t);
+  TOKEN = t;
+  document.getElementById("token-screen").style.display = "none";
+  boot();
+}
+
+async function boot() {
+  TOKEN = getToken();
+  if (!TOKEN) {
+    document.getElementById("splash").style.display = "none";
+    document.getElementById("token-screen").style.display = "flex";
+    return;
+  }
+  try {
+    var r = await withRetry(readMain);
+    DATA = r.data;
+  } catch(e) {}
+
+  document.getElementById("splash").style.display = "none";
+
+  var nb = document.getElementById("name-btns");
+  NAMES.forEach(function(n) {
+    var b = document.createElement("button");
+    b.className = "name-btn"; b.textContent = n;
+    b.onclick = function(){ chooseName(n); };
+    nb.appendChild(b);
+  });
+
+  document.getElementById("name-screen").style.display = "flex";
+  document.getElementById("refresh-btn").onclick = function(){ sync(true); };
+  document.getElementById("switch-btn").onclick  = function(){
+    ME = null;
+    document.getElementById("app").style.display = "none";
+    document.getElementById("name-screen").style.display = "flex";
+  };
+  document.getElementById("advance-btn").onclick = advancePhase;
+
+  setInterval(function(){ sync(false); }, 12000);
+}
+
+function chooseName(n) {
+  ME = n;
+  document.getElementById("name-screen").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  render();
+}
+
+// ── Phase ──────────────────────────────────────────────────────────────
+async function advancePhase() {
+  var next = DATA.phase === "submission" ? "voting" : "results";
+  var msg  = next === "voting" ? "Close submissions and start voting?" : "Reveal results to everyone?";
+  if (!confirm(msg)) return;
+  var r = await withRetry(readMain);
+  var updated = Object.assign({}, r.data, {phase: next});
+  await withRetry(function(){ return writeMain(updated, r.sha); });
+  DATA = updated;
+  if (next === "results") TAB = "overall";
+  render();
+}
+
+// ── Render ─────────────────────────────────────────────────────────────
+function render() {
+  if (!ME) return;
+  var phase = DATA.phase, subs = DATA.subs || [], votes = DATA.votes || {};
+
+  var phaseLabels = {submission:"Submissions Open", voting:"Voting", results:"Results!"};
+  document.getElementById("phase-label").textContent = phaseLabels[phase] || phase;
+  document.getElementById("switch-btn").textContent  = ME + " (switch)";
+
+  var advBtn = document.getElementById("advance-btn");
+  if (phase !== "results") {
+    advBtn.style.display = "block";
+    advBtn.textContent = phase === "submission" ? "Start Voting" : "Show Results";
+  } else { advBtn.style.display = "none"; }
+
+  // Tabs
+  var tabsEl  = document.getElementById("tabs");
+  var allTabs = CATS.slice();
+  if (phase === "results") allTabs.push({id:"overall", label:"Overall"});
+  tabsEl.innerHTML = "";
+  allTabs.forEach(function(c) {
+    var b = document.createElement("button");
+    b.className = "tab-btn" + (TAB === c.id ? " active" : "");
+    b.textContent = c.label;
+    b.onclick = function(){ TAB = c.id; render(); };
+    tabsEl.appendChild(b);
+  });
+
+  var main = document.getElementById("main");
+  main.innerHTML = "";
+
+  if      (phase === "submission")                        renderSubmission(main, subs);
+  else if (phase === "voting")                            renderVoting(main, subs, votes);
+  else if (phase === "results" && TAB === "overall")      renderOverall(main, subs, votes);
+  else if (phase === "results")                           renderCatResult(main, subs, votes);
+}
+
+// ── Submission ─────────────────────────────────────────────────────────
+function renderSubmission(main, subs) {
+  var cat    = CATS.find(function(c){ return c.id === TAB; }) || CATS[0];
+  var mine   = subs.filter(function(s){ return s.cat === TAB && s.who === ME; });
+  var others = subs.filter(function(s){ return s.cat === TAB && s.who !== ME; });
+
+  // Progress card
+  var prog = el("div","card");
+  var pb = el("div","card-body");
+  var pl = el("div","prog-label"); pl.textContent = "Photos submitted (out of 7)";
+  var pr = el("div","prog-row");
+  NAMES.forEach(function(n) {
+    var cnt = subs.filter(function(s){ return s.who === n; }).length;
+    var pi  = el("div","prog-item");
+    var pn  = el("div","prog-num" + (cnt>0?" has":"")); pn.textContent = cnt;
+    var pp  = el("div","prog-name"); pp.textContent = n;
+    pi.appendChild(pn); pi.appendChild(pp); pr.appendChild(pi);
+  });
+  pb.appendChild(pl); pb.appendChild(pr); prog.appendChild(pb);
+  main.appendChild(prog);
+
+  // Upload card
+  var card = el("div","card");
+  var head = el("div","card-head"); head.textContent = "Your " + cat.label + " photo";
+  card.appendChild(head);
+
+  if (mine.length > 0) {
+    var s = mine[0];
+    var wrap = el("div","card-body pos-rel");
+    if (IMGS[s.imgId]) {
+      var img = document.createElement("img");
+      img.src = IMGS[s.imgId]; img.className = "photo-img";
+      wrap.appendChild(img);
+    } else {
+      var ph = el("div","photo-ph"); ph.textContent = "Loading...";
+      wrap.appendChild(ph);
+      loadImg(s.imgId).then(function(d){ if(d) render(); });
+    }
+    if (s.desc) { var dm = el("div","photo-meta"); dm.textContent = s.desc; wrap.appendChild(dm); }
+    var del = document.createElement("button");
+    del.className = "del-btn"; del.textContent = "X";
+    del.onclick = (function(id){ return function(){ removePhoto(id); }; })(s.id);
+    wrap.appendChild(del);
+    card.appendChild(wrap);
+    var done = el("p","card-body hint"); done.textContent = "Photo submitted. Tap X to replace it.";
+    card.appendChild(done);
+  } else {
+    var body   = el("div","card-body");
+    var descIn = document.createElement("input");
+    descIn.type = "text"; descIn.placeholder = "Optional caption...";
+    body.appendChild(descIn);
+
+    // File input — NO capture attribute so gallery is available
+    var fileIn = document.createElement("input");
+    fileIn.type   = "file";
+    fileIn.accept = "image/*";
+    fileIn.style.display = "none";
+    body.appendChild(fileIn);
+
+    var btn = document.createElement("button");
+    btn.className = "btn btn-sea"; btn.textContent = "Add photo from gallery or camera";
+    btn.onclick = function(){ fileIn.click(); };
+    body.appendChild(btn);
+
+    var errP = el("p","hint");
+    errP.style.color = "var(--coral)"; errP.style.display = "none";
+    body.appendChild(errP);
+
+    fileIn.onchange = async function(e) {
+      var f = e.target.files[0]; if (!f) return;
+      btn.disabled = true; btn.textContent = "Uploading... please wait";
+      errP.style.display = "none";
+      try { await addPhoto(TAB, f, descIn.value); }
+      catch(ex) { errP.textContent = "Upload failed — check connection and try again"; errP.style.display = "block"; }
+      btn.disabled = false; btn.textContent = "Add photo from gallery or camera";
+      fileIn.value = "";
+    };
+    card.appendChild(body);
+  }
+  main.appendChild(card);
+
+  if (others.length > 0) {
+    var hint = el("div","card");
+    hint.innerHTML = "<div class='other-hint'>" + others.length + " other photo" + (others.length!==1?"s":"") + " submitted here — shown anonymously at voting</div>";
+    main.appendChild(hint);
+  }
+}
+
+async function addPhoto(cat, file, desc) {
+  var dataUrl = await compressImg(file);
+  var id      = uid();
+  await withRetry(function(){ return saveImgToGH(id, dataUrl); });
+  var r    = await withRetry(readMain);
+  var sub  = {id:id, who:ME, cat:cat, desc:desc.trim(), imgId:id, ts:Date.now()};
+  var next = Object.assign({}, r.data, {subs: r.data.subs.concat([sub])});
+  await withRetry(function(){ return writeMain(next, r.sha); });
+  DATA = next;
+  IMGS[id] = dataUrl;
+  render();
+}
+
+async function removePhoto(pid) {
+  var r    = await withRetry(readMain);
+  var next = Object.assign({}, r.data, {subs: r.data.subs.filter(function(s){ return s.id !== pid; })});
+  await withRetry(function(){ return writeMain(next, r.sha); });
+  DATA = next; render();
+}
+
+// ── Voting ─────────────────────────────────────────────────────────────
+function renderVoting(main, subs, votes) {
+  var cat     = CATS.find(function(c){ return c.id === TAB; }) || CATS[0];
+  var catSubs = subs.filter(function(s){ return s.cat === TAB; });
+  var seed    = ME.split("").reduce(function(a,c){ return a+c.charCodeAt(0); }, 0);
+  var ordered = seededShuffle(catSubs, seed);
+  var myVotes = ((votes[ME]||{})[TAB])||[];
+
+  var whoVoted = NAMES.filter(function(n) {
+    var eligible = catSubs.filter(function(s){ return s.who !== n; });
+    return eligible.length===0 || (((votes[n]||{})[TAB])||[]).length > 0;
+  });
+
+  var info = el("div","card");
+  var ih   = el("div","card-head"); ih.textContent = cat.label;
+  var ib   = el("div","card-body");
+  var hint = el("div","hint"); hint.style.marginBottom="8px";
+  hint.textContent = "Pick up to 2 favourites. Shuffled anonymously. Your own is marked.";
+  var tags = el("div",""); tags.style.cssText="display:flex;flex-wrap:wrap;gap:6px";
+  NAMES.forEach(function(n) {
+    var done = whoVoted.indexOf(n) >= 0;
+    var t = el("span","tag " + (done?"tag-voted":"tag-pending"));
+    t.textContent = (done?"✓ ":"") + n;
+    tags.appendChild(t);
+  });
+  ib.appendChild(hint); ib.appendChild(tags);
+  info.appendChild(ih); info.appendChild(ib);
+  main.appendChild(info);
+
+  if (ordered.length === 0) {
+    var empty = el("div","card");
+    empty.innerHTML = "<div class='card-body' style='text-align:center;color:var(--slate)'>No photos in this category yet</div>";
+    main.appendChild(empty); return;
+  }
+
+  var grid = el("div","photo-grid");
+  ordered.forEach(function(s) {
+    var isOwn  = s.who === ME;
+    var voted  = myVotes.indexOf(s.id) >= 0;
+    var full   = myVotes.length >= 2 && !voted;
+    var card   = el("div","photo-card" + (voted?" voted":"") + (isOwn?" own":""));
+    card.style.cursor = (isOwn||full) ? "default" : "pointer";
+    card.style.opacity = (full&&!voted&&!isOwn) ? "0.65" : "1";
+
+    if (IMGS[s.imgId]) {
+      var img = document.createElement("img"); img.src=IMGS[s.imgId]; img.className="photo-img";
+      card.appendChild(img);
+    } else {
+      var ph = el("div","photo-ph"); ph.textContent="Loading...";
+      card.appendChild(ph);
+      loadImg(s.imgId).then(function(d){ if(d) render(); });
+    }
+
+    var meta = el("div","photo-meta");
+    if (isOwn)        meta.innerHTML="<span style='font-style:italic'>Your photo</span>";
+    else if (voted)   meta.innerHTML="<span style='color:var(--coral);font-weight:700'>Voted — tap to remove</span>";
+    else if (!full)   meta.innerHTML="<span>Tap to vote</span>";
+    else              meta.innerHTML="<span style='font-size:.7rem'>Remove a vote first</span>";
+    if (s.desc) meta.innerHTML += "<div style='margin-top:2px;line-height:1.3'>" + s.desc + "</div>";
+    card.appendChild(meta);
+
+    if (!isOwn && (!full || voted)) {
+      card.onclick = (function(sid){ return function(){ toggleVote(TAB, sid); }; })(s.id);
+    }
+    grid.appendChild(card);
+  });
+  main.appendChild(grid);
+
+  if (myVotes.length >= 2) {
+    var msg = el("div","success-msg");
+    msg.textContent = "Both votes cast here — on to the next category!";
+    main.appendChild(msg);
+  }
+}
+
+async function toggleVote(cat, pid) {
+  var sub = DATA.subs.find(function(s){ return s.id===pid; });
+  if (sub && sub.who===ME) return;
+  var r  = await withRetry(readMain);
+  var mv = (r.data.votes[ME])||{};
+  var cv = mv[cat]||[];
+  if (cv.indexOf(pid)<0 && cv.length>=2) return;
+  var nxt = cv.indexOf(pid)>=0 ? cv.filter(function(x){ return x!==pid; }) : cv.concat([pid]);
+  var newVotes = Object.assign({}, r.data.votes);
+  newVotes[ME] = Object.assign({}, mv); newVotes[ME][cat] = nxt;
+  var next = Object.assign({}, r.data, {votes: newVotes});
+  await withRetry(function(){ return writeMain(next, r.sha); });
+  DATA = next; render();
+}
+
+// ── Category results ───────────────────────────────────────────────────
+function renderCatResult(main, subs, votes) {
+  var cat     = CATS.find(function(c){ return c.id===TAB; }) || CATS[0];
+  var catSubs = subs.filter(function(s){ return s.cat===TAB; });
+  var vc      = {};
+  Object.keys(votes).forEach(function(person) {
+    ((votes[person]||{})[TAB]||[]).forEach(function(id){ vc[id]=(vc[id]||0)+1; });
+  });
+  var sorted  = catSubs.slice().sort(function(a,b){ return (vc[b.id]||0)-(vc[a.id]||0); });
+  var maxV    = sorted[0] ? (vc[sorted[0].id]||0) : 0;
+  var winners = sorted.filter(function(s){ return (vc[s.id]||0)===maxV&&maxV>0; }).map(function(s){ return s.who; });
+
+  var info = el("div","card");
+  var ih   = el("div","card-head"); ih.textContent = cat.label;
+  info.appendChild(ih);
+  var wb = el("div","winner-banner");
+  wb.textContent = maxV>0 ? "Winner: " + winners.join(" and ") + "!" : "No votes cast";
+  if (maxV===0) wb.style.color="var(--slate)";
+  info.appendChild(wb);
+  main.appendChild(info);
+
+  var grid = el("div","photo-grid");
+  sorted.forEach(function(s, i) {
+    var v   = vc[s.id]||0;
+    var cls = i===0&&v>0?"winner":i===1&&v>0?"second":i===2&&v>0?"third":"";
+    var card = el("div","photo-card" + (cls?" "+cls:""));
+    card.style.cursor="default";
+    if (IMGS[s.imgId]) {
+      var img=document.createElement("img"); img.src=IMGS[s.imgId]; img.className="photo-img";
+      card.appendChild(img);
+    } else {
+      var ph=el("div","photo-ph"); ph.textContent="Loading...";
+      card.appendChild(ph);
+      loadImg(s.imgId).then(function(d){ if(d) render(); });
+    }
+    var medal = i===0&&v>0?"1st — ":i===1&&v>0?"2nd — ":i===2&&v>0?"3rd — ":"";
+    var meta = el("div","photo-meta");
+    meta.innerHTML = "<div class='photo-owner'>" + s.who + "</div>" +
+      (s.desc?"<div style='line-height:1.3;margin-bottom:2px'>"+s.desc+"</div>":"") +
+      "<div style='color:"+(i===0&&v>0?"var(--coral)":"var(--slate)")+(i===0&&v>0?";font-weight:700":"")+"'>" +
+      medal + v + " vote" + (v!==1?"s":"") + "</div>";
+    card.appendChild(meta);
+    grid.appendChild(card);
+  });
+  main.appendChild(grid);
+}
+
+// ── Overall results ────────────────────────────────────────────────────
+function renderOverall(main, subs, votes) {
+  var vc = {};
+  Object.keys(votes).forEach(function(person) {
+    CATS.forEach(function(cat) {
+      ((votes[person]||{})[cat.id]||[]).forEach(function(id){ vc[id]=(vc[id]||0)+1; });
+    });
+  });
+  var totals = {};
+  NAMES.forEach(function(n){ totals[n]=0; });
+  subs.forEach(function(s){ totals[s.who]=(totals[s.who]||0)+(vc[s.id]||0); });
+
+  var ranking  = NAMES.slice().sort(function(a,b){ return totals[b]-totals[a]; });
+  var champion = ranking.filter(function(n){ return totals[n]===totals[ranking[0]]&&totals[ranking[0]]>0; });
+  var medals   = ["1st","2nd","3rd","4th"];
+
+  var banner = el("div","overall-banner");
+  var bi = el("div","overall-inner");
+  var bt = el("div","overall-title"); bt.textContent = "Overall Champion" + (champion.length>1?"s":"");
+  var bn = el("div","overall-name"); bn.textContent = champion.length ? champion.join(" and ") : "No votes yet";
+  bi.appendChild(bt); bi.appendChild(bn);
+  if (champion.length) {
+    var bpts = el("div","overall-pts");
+    bpts.textContent = totals[champion[0]] + " total vote" + (totals[champion[0]]!==1?"s":"");
+    bi.appendChild(bpts);
+  }
+  banner.appendChild(bi);
+  var pod = el("div","podium");
+  ranking.forEach(function(n,i) {
+    var pi = el("div","podium-item");
+    var pm = el("div","podium-medal"); pm.textContent = medals[i]||"";
+    var pn = el("div","podium-name");  pn.textContent = n;
+    var pp = el("div","podium-pts");   pp.textContent = totals[n] + " pts";
+    pi.appendChild(pm); pi.appendChild(pn); pi.appendChild(pp);
+    pod.appendChild(pi);
+  });
+  banner.appendChild(pod);
+  main.appendChild(banner);
+
+  // Best photo
+  var bestPhoto = null;
+  if (subs.length) {
+    bestPhoto = subs.reduce(function(a,b){ return (vc[b.id]||0)>(vc[a.id]||0)?b:a; });
+  }
+  if (bestPhoto && (vc[bestPhoto.id]||0)>0) {
+    var bp = el("div","card");
+    var bh = el("div","card-head"); bh.textContent = "Most voted photo of the week";
+    bp.appendChild(bh);
+    if (IMGS[bestPhoto.imgId]) {
+      var img=document.createElement("img"); img.src=IMGS[bestPhoto.imgId]; img.className="photo-img";
+      bp.appendChild(img);
+    } else {
+      var ph2=el("div","photo-ph"); ph2.textContent="Loading...";
+      bp.appendChild(ph2);
+      loadImg(bestPhoto.imgId).then(function(d){ if(d) render(); });
+    }
+    var bm = el("div","card-body");
+    bm.innerHTML = "<strong>" + bestPhoto.who + "</strong>" +
+      (bestPhoto.desc ? " — " + bestPhoto.desc : "") +
+      "<div style='color:var(--coral);font-weight:700;margin-top:2px'>" + (vc[bestPhoto.id]||0) + " votes</div>";
+    bp.appendChild(bm);
+    main.appendChild(bp);
+  }
+
+  // Category breakdown
+  var breakdown = el("div","card");
+  var dbh = el("div","card-head"); dbh.textContent = "Category Winners";
+  breakdown.appendChild(dbh);
+  CATS.forEach(function(cat) {
+    var cs   = subs.filter(function(s){ return s.cat===cat.id; });
+    var maxV = cs.length ? Math.max.apply(null, cs.map(function(s){ return vc[s.id]||0; })) : 0;
+    var wins = maxV>0 ? cs.filter(function(s){ return (vc[s.id]||0)===maxV; }).map(function(s){ return s.who; }) : [];
+    var row  = el("div","cat-row divider");
+    var cl   = el("span",""); cl.textContent = cat.label;
+    var cr   = el("span","cat-winner");
+    cr.textContent = wins.length ? wins.join(" and ") + " (" + maxV + ")" : "No votes";
+    if (!wins.length) cr.style.color = "var(--slate)";
+    row.appendChild(cl); row.appendChild(cr);
+    breakdown.appendChild(row);
+  });
+  main.appendChild(breakdown);
+}
+
+// ── Start ──────────────────────────────────────────────────────────────
+boot();
+</script>
+</body>
+</html>
